@@ -46,7 +46,7 @@ func init() {
 	rootCmd.PersistentFlags().StringP("url", "u", "https://localhost:3333", "The URL to the Gophish server")
 	viper.BindPFlag("url", rootCmd.PersistentFlags().Lookup("url"))
 
-	rootCmd.PersistentFlags().StringP("api-key", "t", "", "A valid Gophish API key")
+	rootCmd.PersistentFlags().StringP("api-key", "T", "", "A valid Gophish API key")
 	viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key"))
 }
 
@@ -76,4 +76,11 @@ func initConfig() {
 
 	viper.AutomaticEnv() // read in environment variables that match
 	viper.ReadInConfig()
+}
+
+func checkError(err error) {
+	if err != nil {
+		fmt.Printf("[!] Error: %v\n", err)
+		os.Exit(1)
+	}
 }

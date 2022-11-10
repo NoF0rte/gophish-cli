@@ -1,0 +1,8 @@
+name: All Content Is Inline Template
+subject: All Content Is Inline Template Subject
+text: |
+  This is inline YAML text on line 1.
+  And this is line 2.
+html: |
+  <p>This is inline YAML HTML on line 1.</p>
+  <div>This is line 2.</div>

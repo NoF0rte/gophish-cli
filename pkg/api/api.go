@@ -3,10 +3,13 @@ package api
 import (
 	"crypto/tls"
 	"fmt"
+	"os"
+	"path/filepath"
 	"regexp"
 
 	"github.com/NoF0rte/gophish-cli/pkg/api/models"
 	"github.com/go-resty/resty/v2"
+	"gopkg.in/yaml.v3"
 )
 
 type Client struct {
@@ -124,4 +127,40 @@ func (c *Client) CreateTemplate(template models.Template) (*models.Template, err
 	}
 
 	return result.(*models.Template), nil
+}
+
+func (c *Client) CreateTemplateFromFile(file string) (*models.Template, error) {
+	bytes, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	var template models.Template
+	err = yaml.Unmarshal(bytes, &template)
+	if err != nil {
+		return nil, err
+	}
+
+	parentDir := filepath.Dir(file)
+	if template.Text == "" && template.TextFile != "" {
+		textFile := filepath.Join(parentDir, template.TextFile)
+
+		bytes, err = os.ReadFile(textFile)
+		if err != nil {
+			return nil, err
+		}
+		template.Text = string(bytes)
+	}
+
+	if template.HTML == "" && template.HTMLFile != "" {
+		htmlFile := filepath.Join(parentDir, template.HTMLFile)
+
+		bytes, err = os.ReadFile(htmlFile)
+		if err != nil {
+			return nil, err
+		}
+		template.HTML = string(bytes)
+	}
+
+	return c.CreateTemplate(template)
 }

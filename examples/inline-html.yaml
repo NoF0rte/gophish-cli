@@ -1,0 +1,6 @@
+name: Inline HTML Template
+subject: Inline HTML Template Subject
+text-file: template-text.txt
+html: |
+  <p>This is inline YAML HTML on line 1.</p>
+  <div>This is line 2.</div>
