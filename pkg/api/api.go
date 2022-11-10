@@ -9,7 +9,7 @@ import (
 
 	"github.com/NoF0rte/gophish-cli/pkg/api/models"
 	"github.com/go-resty/resty/v2"
-	"gopkg.in/yaml.v3"
+	"gopkg.in/yaml.v2"
 )
 
 type Client struct {
