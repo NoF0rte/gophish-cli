@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Template models hold the attributes for an email template to be sent to targets
+// Template models hold the attributes for an e-mail template to be sent to targets
 type Template struct {
 	Id             int64        `json:"id" yaml:"-"`
 	Name           string       `json:"name" yaml:"name"`
@@ -28,7 +28,7 @@ func (t *Template) ToJson() (string, error) {
 	return string(data), nil
 }
 
-// Attachment contains the fields for an email attachment
+// Attachment contains the fields for an e-mail attachment
 type Attachment struct {
 	Content string `json:"content"`
 	Type    string `json:"type"`

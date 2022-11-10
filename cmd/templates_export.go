@@ -15,7 +15,7 @@ import (
 // templatesExportCmd represents the export command
 var templatesExportCmd = &cobra.Command{
 	Use:   "export",
-	Short: "Export email templates",
+	Short: "Export e-mail templates",
 	Run: func(cmd *cobra.Command, args []string) {
 		id, _ := cmd.Flags().GetInt("id")
 		name, _ := cmd.Flags().GetString("name")

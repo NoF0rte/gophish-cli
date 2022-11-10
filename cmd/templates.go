@@ -11,7 +11,7 @@ import (
 // templatesCmd represents the templates command
 var templatesCmd = &cobra.Command{
 	Use:   "templates",
-	Short: "Get or list templates",
+	Short: "List, add, or delete e-mail templates",
 	Run: func(cmd *cobra.Command, args []string) {
 		showContent, _ := cmd.Flags().GetBool("show-content")
 		id, _ := cmd.Flags().GetInt("id")
