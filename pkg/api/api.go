@@ -62,6 +62,22 @@ func (c *Client) post(path string, body interface{}, result interface{}) (*resty
 	return resp, r, nil
 }
 
+func (c *Client) delete(path string, body interface{}, result interface{}) (*resty.Response, interface{}, error) {
+	req := c.newRequest(result)
+	if body != nil {
+		req.SetBody(body)
+	}
+
+	resp, err := req.Delete(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	r := resp.Result()
+
+	return resp, r, nil
+}
+
 func (c *Client) GetTemplates() ([]*models.Template, error) {
 	var templates []*models.Template
 	_, _, err := c.get("/api/templates/", &templates)
@@ -116,6 +132,37 @@ func (c *Client) GetTemplatesByRegex(re string) ([]*models.Template, error) {
 	}
 
 	return filtered, nil
+}
+
+func (c *Client) DeleteTemplateByID(id int64) (*models.GenericResponse, error) {
+	r := &models.GenericResponse{}
+	_, _, err := c.delete(fmt.Sprintf("/api/templates/%d", id), nil, r)
+	if err != nil {
+		return nil, err
+	}
+
+	return r, nil
+}
+
+func (c *Client) DeleteTemplateByName(name string) (*models.GenericResponse, error) {
+	templates, err := c.GetTemplates()
+	if err != nil {
+		return nil, err
+	}
+
+	var template *models.Template
+	for _, t := range templates {
+		if t.Name == name {
+			template = t
+			break
+		}
+	}
+
+	if template == nil {
+		return nil, fmt.Errorf("template %s not found", name)
+	}
+
+	return c.DeleteTemplateByID(template.Id)
 }
 
 func (c *Client) CreateTemplate(template models.Template) (*models.Template, error) {
