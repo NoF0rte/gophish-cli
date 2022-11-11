@@ -53,7 +53,7 @@ var templatesExportCmd = &cobra.Command{
 		dir, _ := cmd.Flags().GetString("dir")
 		contentFiles, _ := cmd.Flags().GetBool("content-files")
 
-		fmt.Printf("[+] Exporting %d templates to %s\n", len(templates), dir)
+		fmt.Printf("[+] Exporting %d templates...\n", len(templates))
 
 		replaceRe := regexp.MustCompile(`[ /]`)
 		for _, t := range templates {
@@ -96,6 +96,5 @@ func init() {
 	templatesExportCmd.Flags().Int("id", 0, "Export the template by ID")
 	templatesExportCmd.Flags().StringP("regex", "r", "", "Export the templates with the name matching the regex.")
 	templatesExportCmd.Flags().Bool("content-files", false, "Create separate template content files for each template.")
-	templatesExportCmd.Flags().StringP("dir", "d", "", "Directory to export the templates.")
-	templatesExportCmd.MarkFlagRequired("dir")
+	templatesExportCmd.Flags().StringP("dir", "d", "", "Directory to export the templates. Defaults to the current directory.")
 }
