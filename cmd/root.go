@@ -21,14 +21,6 @@ var rootCmd = &cobra.Command{
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		client = api.NewClient(viper.GetString("url"), viper.GetString("api-key"))
 	},
-	Run: func(cmd *cobra.Command, args []string) {
-		template, err := client.GetTemplateByID(1)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println(template)
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

@@ -3,6 +3,7 @@ package api
 import (
 	"crypto/tls"
 	"fmt"
+	"html"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -76,6 +77,54 @@ func (c *Client) delete(path string, body interface{}, result interface{}) (*res
 	r := resp.Result()
 
 	return resp, r, nil
+}
+
+func (c *Client) GetAPIKey(username string, password string) (string, error) {
+	resp, err := c.client.R().Get("/login")
+	if err != nil {
+		return "", err
+	}
+
+	cookies := resp.Cookies()
+	csrfTokenRe := regexp.MustCompile(`name="csrf_token"\s*value="([^"]+)"`)
+
+	body := string(resp.Body())
+	matches := csrfTokenRe.FindStringSubmatch(body)
+	if len(matches) == 0 {
+		return "", fmt.Errorf("error finding csrf_token")
+	}
+
+	csrfToken := html.UnescapeString(matches[1])
+
+	resp, err = c.client.R().
+		SetCookies(cookies).
+		SetFormData(map[string]string{
+			"username":   username,
+			"password":   password,
+			"csrf_token": csrfToken,
+		}).
+		Post("/login")
+
+	if err != nil {
+		return "", nil
+	}
+
+	resp, err = c.client.R().
+		SetCookies(resp.Cookies()).
+		Get("/settings")
+	if err != nil {
+		return "", nil
+	}
+
+	body = string(resp.Body())
+	apiKeyRe := regexp.MustCompile(`api_key\s*:\s*"([^"]+)"`)
+
+	matches = apiKeyRe.FindStringSubmatch(body)
+	if len(matches) == 0 {
+		return "", fmt.Errorf("error finding api key")
+	}
+
+	return matches[1], nil
 }
 
 func (c *Client) GetTemplates() ([]*models.Template, error) {
