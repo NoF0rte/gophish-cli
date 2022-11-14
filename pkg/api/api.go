@@ -106,7 +106,11 @@ func (c *Client) GetAPIKey(username string, password string) (string, error) {
 		Post("/login")
 
 	if err != nil {
-		return "", nil
+		return "", err
+	}
+
+	if resp.IsError() {
+		return "", fmt.Errorf("error: %s", resp.Status())
 	}
 
 	resp, err = c.client.R().

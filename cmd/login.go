@@ -29,7 +29,7 @@ var loginCmd = &cobra.Command{
 
 		apiKey, err := client.GetAPIKey(username, password)
 		if err != nil {
-			panic(err)
+			checkError(err)
 		}
 
 		fmt.Println(apiKey)
