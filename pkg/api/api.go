@@ -201,8 +201,8 @@ func (c *Client) GetTemplatesByRegex(re string) ([]*models.Template, error) {
 	return filtered, nil
 }
 
-func (c *Client) GetSendingProfiles() ([]*models.SMTP, error) {
-	var profiles []*models.SMTP
+func (c *Client) GetSendingProfiles() ([]*models.SendingProfile, error) {
+	var profiles []*models.SendingProfile
 	_, _, err := c.get("/api/smtp/", &profiles)
 	if err != nil {
 		return nil, err
@@ -211,8 +211,8 @@ func (c *Client) GetSendingProfiles() ([]*models.SMTP, error) {
 	return profiles, nil
 }
 
-func (c *Client) GetSendingProfileByID(id int) (*models.SMTP, error) {
-	profile := &models.SMTP{}
+func (c *Client) GetSendingProfileByID(id int) (*models.SendingProfile, error) {
+	profile := &models.SendingProfile{}
 	_, _, err := c.get(fmt.Sprintf("/api/smtp/%d", id), profile)
 	if err != nil {
 		return nil, err
@@ -225,7 +225,7 @@ func (c *Client) GetSendingProfileByID(id int) (*models.SMTP, error) {
 	return profile, nil
 }
 
-func (c *Client) GetSendingProfileByName(name string) (*models.SMTP, error) {
+func (c *Client) GetSendingProfileByName(name string) (*models.SendingProfile, error) {
 	profiles, err := c.GetSendingProfiles()
 	if err != nil {
 		return nil, err
@@ -240,13 +240,13 @@ func (c *Client) GetSendingProfileByName(name string) (*models.SMTP, error) {
 	return nil, nil
 }
 
-func (c *Client) GetSendingProfileByRegex(re string) ([]*models.SMTP, error) {
+func (c *Client) GetSendingProfileByRegex(re string) ([]*models.SendingProfile, error) {
 	profiles, err := c.GetSendingProfiles()
 	if err != nil {
 		return nil, err
 	}
 
-	var filtered []*models.SMTP
+	var filtered []*models.SendingProfile
 	regex := regexp.MustCompile(re)
 	for _, t := range profiles {
 		if regex.MatchString(t.Name) {
@@ -308,22 +308,22 @@ func (c *Client) CreateTemplateFromFile(file string, vars map[string]string) (*m
 	return c.CreateTemplate(template)
 }
 
-func (c *Client) CreateSendingProfile(profile *models.SMTP) (*models.SMTP, error) {
+func (c *Client) CreateSendingProfile(profile *models.SendingProfile) (*models.SendingProfile, error) {
 	profile.Id = 0 // Ensure the ID is always 0
 
 	if profile.Interface == "" {
 		profile.Interface = models.InterfaceSMTP
 	}
 
-	_, result, err := c.post("/api/smtp/", profile, &models.SMTP{})
+	_, result, err := c.post("/api/smtp/", profile, &models.SendingProfile{})
 	if err != nil {
 		return nil, err
 	}
 
-	return result.(*models.SMTP), nil
+	return result.(*models.SendingProfile), nil
 }
 
-func (c *Client) CreateSendingProfileFromFile(file string, vars map[string]string) (*models.SMTP, error) {
+func (c *Client) CreateSendingProfileFromFile(file string, vars map[string]string) (*models.SendingProfile, error) {
 	profile, err := models.ProfileFromFile(file, vars)
 	if err != nil {
 		return nil, err
@@ -348,7 +348,7 @@ func (c *Client) DeleteSendingProfileByName(name string) (*models.GenericRespons
 		return nil, err
 	}
 
-	var profile *models.SMTP
+	var profile *models.SendingProfile
 	for _, s := range profiles {
 		if s.Name == name {
 			profile = s

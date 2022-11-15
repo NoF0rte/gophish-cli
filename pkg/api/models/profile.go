@@ -16,8 +16,8 @@ const (
 	InterfaceSMTP InterfaceType = "SMTP"
 )
 
-// SMTP contains the attributes needed to handle the sending of campaign emails
-type SMTP struct {
+// SendingProfile contains the attributes needed to handle the sending of campaign emails
+type SendingProfile struct {
 	Id               int64         `json:"id" yaml:"-"`
 	Interface        InterfaceType `json:"interface_type" yaml:"-"`
 	Name             string        `json:"name" yaml:"name"`
@@ -30,7 +30,7 @@ type SMTP struct {
 	ModifiedDate     time.Time     `json:"modified_date" yaml:"-"`
 }
 
-func (s *SMTP) ToJson() (string, error) {
+func (s *SendingProfile) ToJson() (string, error) {
 	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return "", err
@@ -39,7 +39,7 @@ func (s *SMTP) ToJson() (string, error) {
 	return string(data), nil
 }
 
-func (s *SMTP) replaceVars(vars map[string]string) error {
+func (s *SendingProfile) replaceVars(vars map[string]string) error {
 	replace := func(text string) (string, error) {
 		t, err := template.New("replacement").Parse(text)
 		if err != nil {
@@ -87,13 +87,13 @@ func (s *SMTP) replaceVars(vars map[string]string) error {
 	return nil
 }
 
-func ProfileFromFile(file string, vars map[string]string) (*SMTP, error) {
+func ProfileFromFile(file string, vars map[string]string) (*SendingProfile, error) {
 	bytes, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}
 
-	var profile SMTP
+	var profile SendingProfile
 	err = yaml.Unmarshal(bytes, &profile)
 	if err != nil {
 		return nil, err

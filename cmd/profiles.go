@@ -18,7 +18,7 @@ var profilesCmd = &cobra.Command{
 		re, _ := cmd.Flags().GetString("regex")
 
 		var err error
-		var profiles []*models.SMTP
+		var profiles []*models.SendingProfile
 		if id > 0 {
 			profile, err := client.GetSendingProfileByID(id)
 			checkError(err)
