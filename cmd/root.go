@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 
 	"github.com/NoF0rte/gophish-cli/pkg/api"
 	"github.com/mitchellh/go-homedir"
@@ -13,12 +14,31 @@ import (
 
 var cfgFile string
 var client *api.Client
+var variables map[string]string = make(map[string]string)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gophish-cli",
 	Short: "A CLI to interact with the Gophish API",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		type variable struct {
+			Name  string `yaml:"name"`
+			Value string `yaml:"value"`
+		}
+		var variableList []variable
+
+		err := viper.UnmarshalKey("vars", &variableList)
+		checkError(err)
+
+		for _, v := range variableList {
+			variables[v.Name] = v.Value
+		}
+
+		vars, _ := cmd.Flags().GetStringToString("vars")
+		for key, value := range vars {
+			variables[key] = value
+		}
+
 		client = api.NewClient(viper.GetString("url"), viper.GetString("api-key"))
 	},
 }
@@ -40,9 +60,18 @@ func init() {
 
 	rootCmd.PersistentFlags().StringP("api-key", "T", "", "A valid Gophish API key")
 	viper.BindPFlag("api-key", rootCmd.PersistentFlags().Lookup("api-key"))
+
+	rootCmd.PersistentFlags().StringToStringP("vars", "V", nil, "Variables to use when creating/editing items from files that have replacement variables. Use name=value syntax.")
 }
 
 func initConfig() {
+	setConfigDefault("vars", []map[string]string{
+		{
+			"name":  "Example",
+			"value": "Value",
+		},
+	})
+
 	// Find home directory.
 	home, err := homedir.Dir()
 	if err != nil {
@@ -74,5 +103,32 @@ func checkError(err error) {
 	if err != nil {
 		fmt.Printf("[!] Error: %v\n", err)
 		os.Exit(1)
+	}
+}
+
+// If no config file exists, all possible keys in the defaults
+// need to be registered with viper otherwise viper will only think
+// the keys explicitly set via viper.SetDefault() exist.
+func setConfigDefault(key string, value interface{}) {
+	valueType := reflect.TypeOf(value)
+	valueValue := reflect.ValueOf(value)
+
+	if valueType.Kind() == reflect.Map {
+		iter := valueValue.MapRange()
+		for iter.Next() {
+			k := iter.Key().Interface()
+			v := iter.Value().Interface()
+			setConfigDefault(fmt.Sprintf("%s.%s", key, k), v)
+		}
+	} else if valueType.Kind() == reflect.Struct {
+		numFields := valueType.NumField()
+		for i := 0; i < numFields; i++ {
+			structField := valueType.Field(i)
+			fieldValue := valueValue.Field(i)
+
+			setConfigDefault(fmt.Sprintf("%s.%s", key, structField.Name), fieldValue.Interface())
+		}
+	} else {
+		viper.SetDefault(key, value)
 	}
 }

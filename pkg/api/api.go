@@ -4,13 +4,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	"html"
-	"os"
-	"path/filepath"
 	"regexp"
 
 	"github.com/NoF0rte/gophish-cli/pkg/api/models"
 	"github.com/go-resty/resty/v2"
-	"gopkg.in/yaml.v2"
 )
 
 type Client struct {
@@ -187,6 +184,62 @@ func (c *Client) GetTemplatesByRegex(re string) ([]*models.Template, error) {
 	return filtered, nil
 }
 
+func (c *Client) GetSendingProfiles() ([]*models.SMTP, error) {
+	var profiles []*models.SMTP
+	_, _, err := c.get("/api/smtp/", &profiles)
+	if err != nil {
+		return nil, err
+	}
+
+	return profiles, nil
+}
+
+func (c *Client) GetSendingProfileByID(id int) (*models.SMTP, error) {
+	profile := &models.SMTP{}
+	_, _, err := c.get(fmt.Sprintf("/api/smtp/%d", id), profile)
+	if err != nil {
+		return nil, err
+	}
+
+	if profile.Id == 0 {
+		return nil, nil
+	}
+
+	return profile, nil
+}
+
+func (c *Client) GetSendingProfileByName(name string) (*models.SMTP, error) {
+	profiles, err := c.GetSendingProfiles()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, t := range profiles {
+		if t.Name == name {
+			return t, nil
+		}
+	}
+
+	return nil, nil
+}
+
+func (c *Client) GetSendingProfileByRegex(re string) ([]*models.SMTP, error) {
+	profiles, err := c.GetSendingProfiles()
+	if err != nil {
+		return nil, err
+	}
+
+	var filtered []*models.SMTP
+	regex := regexp.MustCompile(re)
+	for _, t := range profiles {
+		if regex.MatchString(t.Name) {
+			filtered = append(filtered, t)
+		}
+	}
+
+	return filtered, nil
+}
+
 func (c *Client) DeleteTemplateByID(id int64) (*models.GenericResponse, error) {
 	r := &models.GenericResponse{}
 	_, _, err := c.delete(fmt.Sprintf("/api/templates/%d", id), nil, r)
@@ -245,22 +298,42 @@ func (c *Client) CreateTemplateFromFile(file string) (*models.Template, error) {
 	if template.Text == "" && template.TextFile != "" {
 		textFile := filepath.Join(parentDir, template.TextFile)
 
-		bytes, err = os.ReadFile(textFile)
-		if err != nil {
-			return nil, err
-		}
-		template.Text = string(bytes)
+func (c *Client) CreateSendingProfileFromFile(file string, vars map[string]string) (*models.SMTP, error) {
+	profile, err := models.ProfileFromFile(file, vars)
+	if err != nil {
+		return nil, err
 	}
 
-	if template.HTML == "" && template.HTMLFile != "" {
-		htmlFile := filepath.Join(parentDir, template.HTMLFile)
+	return c.CreateSendingProfile(profile)
+}
 
-		bytes, err = os.ReadFile(htmlFile)
-		if err != nil {
-			return nil, err
-		}
-		template.HTML = string(bytes)
+func (c *Client) DeleteSendingProfileByID(id int64) (*models.GenericResponse, error) {
+	r := &models.GenericResponse{}
+	_, _, err := c.delete(fmt.Sprintf("/api/smtp/%d", id), nil, r)
+	if err != nil {
+		return nil, err
 	}
 
-	return c.CreateTemplate(template)
+	return r, nil
+}
+
+func (c *Client) DeleteSendingProfileByName(name string) (*models.GenericResponse, error) {
+	profiles, err := c.GetSendingProfiles()
+	if err != nil {
+		return nil, err
+	}
+
+	var profile *models.SMTP
+	for _, s := range profiles {
+		if s.Name == name {
+			profile = s
+			break
+		}
+	}
+
+	if profile == nil {
+		return nil, fmt.Errorf("profile %s not found", name)
+	}
+
+	return c.DeleteSendingProfileByID(profile.Id)
 }

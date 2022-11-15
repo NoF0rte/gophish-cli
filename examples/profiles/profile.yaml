@@ -1,0 +1,7 @@
+name: Example Sending Profile
+from: "No Reply <noreply@example.com>"
+host: smtp.sendgrid.net:587
+username: apikey
+headers:
+  - key: X-Mailer
+    value: ""
