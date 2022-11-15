@@ -13,16 +13,18 @@ import (
 
 // Template models hold the attributes for an e-mail template to be sent to targets
 type Template struct {
-	Id             int64        `json:"id" yaml:"-"`
-	Name           string       `json:"name" yaml:"name"`
-	EnvelopeSender string       `json:"envelope_sender" yaml:"-"`
-	Subject        string       `json:"subject" yaml:"subject"`
-	Text           string       `json:"text,omitempty" yaml:"text,omitempty"`
-	TextFile       string       `json:"-" yaml:"text-file,omitempty"`
-	HTML           string       `json:"html,omitempty" yaml:"html,omitempty"`
-	HTMLFile       string       `json:"-" yaml:"html-file,omitempty"`
-	ModifiedDate   time.Time    `json:"modified_date" yaml:"-"`
-	Attachments    []Attachment `json:"attachments" yaml:"-"`
+	Id             int64           `json:"id" yaml:"-"`
+	Name           string          `json:"name" yaml:"name"`
+	EnvelopeSender string          `json:"envelope_sender" yaml:"-"`
+	Subject        string          `json:"subject" yaml:"subject"`
+	Text           string          `json:"text,omitempty" yaml:"text,omitempty"`
+	TextFile       string          `json:"-" yaml:"text-file,omitempty"`
+	HTML           string          `json:"html,omitempty" yaml:"html,omitempty"`
+	HTMLFile       string          `json:"-" yaml:"html-file,omitempty"`
+	ModifiedDate   time.Time       `json:"modified_date" yaml:"-"`
+	Attachments    []Attachment    `json:"attachments" yaml:"-"`
+	ProfileFile    string          `json:"-" yaml:"profile-file,omitempty"`
+	Profile        *SendingProfile `json:"-" yaml:"profile,omitempty"`
 }
 
 func (t *Template) ToJson() (string, error) {
@@ -61,6 +63,10 @@ func (t *Template) replaceVars(vars map[string]string) error {
 	}
 	t.Subject = subject
 
+	if t.Profile != nil {
+		err = t.Profile.replaceVars(vars)
+	}
+
 	return err
 }
 
@@ -97,15 +103,15 @@ func TemplateFromFile(file string, vars map[string]string) (*Template, error) {
 		template.HTML = string(bytes)
 	}
 
-	// if template.Profile == nil && template.ProfileFile != "" {
-	// 	profileFile := filepath.Join(parentDir, template.ProfileFile)
-	// 	profile, err := ProfileFromFile(profileFile, vars)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
+	if template.Profile == nil && template.ProfileFile != "" {
+		profileFile := filepath.Join(parentDir, template.ProfileFile)
+		profile, err := SendingProfileFromFile(profileFile, vars)
+		if err != nil {
+			return nil, err
+		}
 
-	// 	template.Profile = profile
-	// }
+		template.Profile = profile
+	}
 
 	err = template.replaceVars(vars)
 	if err != nil {

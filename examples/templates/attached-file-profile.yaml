@@ -1,6 +1,5 @@
 name: Example Email Template
 subject: Example Email Template Subject
-text: |
-  This is inline YAML text on line 1.
-  And this is line 2.
+text-file: template-text.txt
 html-file: template-html.html
+profile-file: ../profiles/example.yaml

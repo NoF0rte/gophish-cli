@@ -77,6 +77,22 @@ func (c *Client) post(path string, body interface{}, result interface{}) (*resty
 	return resp, r, nil
 }
 
+func (c *Client) put(path string, body interface{}, result interface{}) (*resty.Response, interface{}, error) {
+	req := c.newRequest(result)
+	if body != nil {
+		req.SetBody(body)
+	}
+
+	resp, err := req.Put(path)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	r := resp.Result()
+
+	return resp, r, nil
+}
+
 func (c *Client) delete(path string, body interface{}, result interface{}) (*resty.Response, interface{}, error) {
 	req := c.newRequest(result)
 	if body != nil {
@@ -299,15 +315,6 @@ func (c *Client) CreateTemplate(template *models.Template) (*models.Template, er
 	return result.(*models.Template), nil
 }
 
-func (c *Client) CreateTemplateFromFile(file string, vars map[string]string) (*models.Template, error) {
-	template, err := models.TemplateFromFile(file, vars)
-	if err != nil {
-		return nil, err
-	}
-
-	return c.CreateTemplate(template)
-}
-
 func (c *Client) CreateSendingProfile(profile *models.SendingProfile) (*models.SendingProfile, error) {
 	profile.Id = 0 // Ensure the ID is always 0
 
@@ -323,13 +330,14 @@ func (c *Client) CreateSendingProfile(profile *models.SendingProfile) (*models.S
 	return result.(*models.SendingProfile), nil
 }
 
-func (c *Client) CreateSendingProfileFromFile(file string, vars map[string]string) (*models.SendingProfile, error) {
-	profile, err := models.ProfileFromFile(file, vars)
+func (c *Client) UpdateSendingProfile(id int64, profile *models.SendingProfile) (*models.SendingProfile, error) {
+	profile.Id = id
+	_, result, err := c.put(fmt.Sprintf("/api/smtp/%d", id), profile, &models.SendingProfile{})
 	if err != nil {
 		return nil, err
 	}
 
-	return c.CreateSendingProfile(profile)
+	return result.(*models.SendingProfile), nil
 }
 
 func (c *Client) DeleteSendingProfileByID(id int64) (*models.GenericResponse, error) {

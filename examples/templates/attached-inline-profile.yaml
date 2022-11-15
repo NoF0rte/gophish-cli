@@ -1,0 +1,13 @@
+name: Example Email Template
+subject: Example Email Template Subject
+text-file: template-text.txt
+html-file: template-html.html
+profile:
+  name: Example Sending Profile
+  from: "No Reply <noreply@example.com>"
+  host: smtp.sendgrid.net:587
+  username: apikey
+  password: '{{.SEND_GRID_API_KEY}}'
+  headers:
+    - key: X-Mailer
+      value: ""

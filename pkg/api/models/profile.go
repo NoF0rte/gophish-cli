@@ -28,6 +28,7 @@ type SendingProfile struct {
 	IgnoreCertErrors bool          `json:"ignore_cert_errors" yaml:"ignore-cert-errors"`
 	Headers          []Header      `json:"headers" yaml:"headers"`
 	ModifiedDate     time.Time     `json:"modified_date" yaml:"-"`
+	varsReplaced     bool
 }
 
 func (s *SendingProfile) ToJson() (string, error) {
@@ -40,6 +41,10 @@ func (s *SendingProfile) ToJson() (string, error) {
 }
 
 func (s *SendingProfile) replaceVars(vars map[string]string) error {
+	if s.varsReplaced {
+		return nil
+	}
+
 	replace := func(text string) (string, error) {
 		t, err := template.New("replacement").Parse(text)
 		if err != nil {
@@ -84,10 +89,11 @@ func (s *SendingProfile) replaceVars(vars map[string]string) error {
 	}
 	s.FromAddress = from
 
+	s.varsReplaced = true
 	return nil
 }
 
-func ProfileFromFile(file string, vars map[string]string) (*SendingProfile, error) {
+func SendingProfileFromFile(file string, vars map[string]string) (*SendingProfile, error) {
 	bytes, err := os.ReadFile(file)
 	if err != nil {
 		return nil, err

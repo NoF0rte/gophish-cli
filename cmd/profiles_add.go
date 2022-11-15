@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/NoF0rte/gophish-cli/pkg/api/models"
 	"github.com/spf13/cobra"
 )
 
@@ -28,9 +29,12 @@ var addCmd = &cobra.Command{
 		}
 
 		for _, p := range profilePaths {
-			fmt.Printf("[+] Adding profile %s\n", p)
+			profile, err := models.SendingProfileFromFile(p, variables)
+			checkError(err)
 
-			_, err := client.CreateSendingProfileFromFile(p, variables)
+			fmt.Printf("[+] Adding sending profile \"%s\"\n", profile.Name)
+
+			_, err = client.CreateSendingProfile(profile)
 			checkError(err)
 		}
 	},

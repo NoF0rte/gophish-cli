@@ -2,6 +2,7 @@ name: Example Sending Profile
 from: "No Reply <noreply@example.com>"
 host: smtp.sendgrid.net:587
 username: apikey
+password: '{{.SEND_GRID_API_KEY}}'
 headers:
   - key: X-Mailer
     value: ""
