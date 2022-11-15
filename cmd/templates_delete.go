@@ -19,9 +19,7 @@ var templatesDeleteCmd = &cobra.Command{
 		var resp *models.GenericResponse
 		if id > 0 {
 			resp, err = client.DeleteTemplateByID(int64(id))
-		}
-
-		if name != "" {
+		} else if name != "" {
 			resp, err = client.DeleteTemplateByName(name)
 		}
 

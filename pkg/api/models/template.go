@@ -1,8 +1,14 @@
 package models
 
 import (
+	"bytes"
 	"encoding/json"
+	"os"
+	"path/filepath"
+	"text/template"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 // Template models hold the attributes for an e-mail template to be sent to targets
@@ -26,6 +32,87 @@ func (t *Template) ToJson() (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func (t *Template) replaceVars(vars map[string]string) error {
+	replace := func(text string) (string, error) {
+		t, err := template.New("replacement").Parse(text)
+		if err != nil {
+			return "", err
+		}
+
+		buf := new(bytes.Buffer)
+		err = t.Execute(buf, vars)
+		if err != nil {
+			return "", err
+		}
+		return buf.String(), nil
+	}
+
+	name, err := replace(t.Name)
+	if err != nil {
+		return err
+	}
+	t.Name = name
+
+	subject, err := replace(t.Subject)
+	if err != nil {
+		return err
+	}
+	t.Subject = subject
+
+	return err
+}
+
+func TemplateFromFile(file string, vars map[string]string) (*Template, error) {
+	bytes, err := os.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+
+	var template Template
+	err = yaml.Unmarshal(bytes, &template)
+	if err != nil {
+		return nil, err
+	}
+
+	parentDir := filepath.Dir(file)
+	if template.Text == "" && template.TextFile != "" {
+		textFile := filepath.Join(parentDir, template.TextFile)
+
+		bytes, err = os.ReadFile(textFile)
+		if err != nil {
+			return nil, err
+		}
+		template.Text = string(bytes)
+	}
+
+	if template.HTML == "" && template.HTMLFile != "" {
+		htmlFile := filepath.Join(parentDir, template.HTMLFile)
+
+		bytes, err = os.ReadFile(htmlFile)
+		if err != nil {
+			return nil, err
+		}
+		template.HTML = string(bytes)
+	}
+
+	// if template.Profile == nil && template.ProfileFile != "" {
+	// 	profileFile := filepath.Join(parentDir, template.ProfileFile)
+	// 	profile, err := ProfileFromFile(profileFile, vars)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+
+	// 	template.Profile = profile
+	// }
+
+	err = template.replaceVars(vars)
+	if err != nil {
+		return nil, err
+	}
+
+	return &template, nil
 }
 
 // Attachment contains the fields for an e-mail attachment

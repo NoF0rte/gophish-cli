@@ -30,7 +30,7 @@ var addTemplateCmd = &cobra.Command{
 		for _, t := range templatePaths {
 			fmt.Printf("[+] Adding template %s\n", t)
 
-			_, err := client.CreateTemplateFromFile(t)
+			_, err := client.CreateTemplateFromFile(t, variables)
 			checkError(err)
 		}
 	},

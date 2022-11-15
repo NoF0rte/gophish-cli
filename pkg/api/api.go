@@ -271,7 +271,7 @@ func (c *Client) DeleteTemplateByName(name string) (*models.GenericResponse, err
 	return c.DeleteTemplateByID(template.Id)
 }
 
-func (c *Client) CreateTemplate(template models.Template) (*models.Template, error) {
+func (c *Client) CreateTemplate(template *models.Template) (*models.Template, error) {
 	template.Id = 0 // Ensure the ID is always 0
 
 	_, result, err := c.post("/api/templates/", template, &models.Template{})
@@ -282,21 +282,29 @@ func (c *Client) CreateTemplate(template models.Template) (*models.Template, err
 	return result.(*models.Template), nil
 }
 
-func (c *Client) CreateTemplateFromFile(file string) (*models.Template, error) {
-	bytes, err := os.ReadFile(file)
+func (c *Client) CreateTemplateFromFile(file string, vars map[string]string) (*models.Template, error) {
+	template, err := models.TemplateFromFile(file, vars)
 	if err != nil {
 		return nil, err
 	}
 
-	var template models.Template
-	err = yaml.Unmarshal(bytes, &template)
+	return c.CreateTemplate(template)
+}
+
+func (c *Client) CreateSendingProfile(profile *models.SMTP) (*models.SMTP, error) {
+	profile.Id = 0 // Ensure the ID is always 0
+
+	if profile.Interface == "" {
+		profile.Interface = models.InterfaceSMTP
+	}
+
+	_, result, err := c.post("/api/smtp/", profile, &models.SMTP{})
 	if err != nil {
 		return nil, err
 	}
 
-	parentDir := filepath.Dir(file)
-	if template.Text == "" && template.TextFile != "" {
-		textFile := filepath.Join(parentDir, template.TextFile)
+	return result.(*models.SMTP), nil
+}
 
 func (c *Client) CreateSendingProfileFromFile(file string, vars map[string]string) (*models.SMTP, error) {
 	profile, err := models.ProfileFromFile(file, vars)
