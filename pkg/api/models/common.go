@@ -1,6 +1,10 @@
 package models
 
-import "encoding/json"
+import (
+	"bytes"
+	"encoding/json"
+	"text/template"
+)
 
 type GenericResponse struct {
 	Message string `json:"message"`
@@ -15,4 +19,18 @@ func (r *GenericResponse) ToJson() (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func templateReplace(text string, vars map[string]string) (string, error) {
+	t, err := template.New("replacement").Option("missingkey=error").Parse(text)
+	if err != nil {
+		return "", err
+	}
+
+	buf := new(bytes.Buffer)
+	err = t.Execute(buf, vars)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

@@ -1,11 +1,9 @@
 package models
 
 import (
-	"bytes"
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"text/template"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -37,27 +35,13 @@ func (t *Template) ToJson() (string, error) {
 }
 
 func (t *Template) replaceVars(vars map[string]string) error {
-	replace := func(text string) (string, error) {
-		t, err := template.New("replacement").Parse(text)
-		if err != nil {
-			return "", err
-		}
-
-		buf := new(bytes.Buffer)
-		err = t.Execute(buf, vars)
-		if err != nil {
-			return "", err
-		}
-		return buf.String(), nil
-	}
-
-	name, err := replace(t.Name)
+	name, err := templateReplace(t.Name, vars)
 	if err != nil {
 		return err
 	}
 	t.Name = name
 
-	subject, err := replace(t.Subject)
+	subject, err := templateReplace(t.Subject, vars)
 	if err != nil {
 		return err
 	}

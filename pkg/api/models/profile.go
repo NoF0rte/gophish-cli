@@ -1,10 +1,8 @@
 package models
 
 import (
-	"bytes"
 	"encoding/json"
 	"os"
-	"text/template"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -45,45 +43,31 @@ func (s *SendingProfile) replaceVars(vars map[string]string) error {
 		return nil
 	}
 
-	replace := func(text string) (string, error) {
-		t, err := template.New("replacement").Parse(text)
-		if err != nil {
-			return "", err
-		}
-
-		buf := new(bytes.Buffer)
-		err = t.Execute(buf, vars)
-		if err != nil {
-			return "", err
-		}
-		return buf.String(), nil
-	}
-
-	name, err := replace(s.Name)
+	name, err := templateReplace(s.Name, vars)
 	if err != nil {
 		return err
 	}
 	s.Name = name
 
-	host, err := replace(s.Host)
+	host, err := templateReplace(s.Host, vars)
 	if err != nil {
 		return err
 	}
 	s.Host = host
 
-	username, err := replace(s.Username)
+	username, err := templateReplace(s.Username, vars)
 	if err != nil {
 		return err
 	}
 	s.Username = username
 
-	password, err := replace(s.Password)
+	password, err := templateReplace(s.Password, vars)
 	if err != nil {
 		return err
 	}
 	s.Password = password
 
-	from, err := replace(s.FromAddress)
+	from, err := templateReplace(s.FromAddress, vars)
 	if err != nil {
 		return err
 	}
