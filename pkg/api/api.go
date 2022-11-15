@@ -15,14 +15,31 @@ type Client struct {
 }
 
 func NewClient(url string, apiKey string) *Client {
-	return &Client{
-		client: resty.New().
-			SetAuthToken(apiKey).
-			SetBaseURL(url).
-			SetTLSClientConfig(&tls.Config{
-				InsecureSkipVerify: true,
-			}),
+	client := resty.New().
+		SetBaseURL(url).
+		SetTLSClientConfig(&tls.Config{
+			InsecureSkipVerify: true,
+		})
+	if apiKey != "" {
+		client.SetAuthToken(apiKey)
 	}
+
+	return &Client{
+		client: client,
+	}
+}
+
+func NewClientFromCredentials(url string, username string, password string) (*Client, error) {
+	c := NewClient(url, "")
+
+	apiKey, err := c.GetAPIKey(username, password)
+	if err != nil {
+		return nil, err
+	}
+
+	c.client.SetAuthToken(apiKey)
+
+	return c, nil
 }
 
 func (c *Client) newRequest(result interface{}) *resty.Request {
