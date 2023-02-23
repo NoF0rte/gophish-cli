@@ -16,7 +16,7 @@ const (
 
 // SendingProfile contains the attributes needed to handle the sending of campaign emails
 type SendingProfile struct {
-	Id               int64         `json:"id" yaml:"-"`
+	ID               int64         `json:"id" yaml:"-"`
 	Interface        InterfaceType `json:"interface_type" yaml:"-"`
 	Name             string        `json:"name" yaml:"name"`
 	Host             string        `json:"host" yaml:"host"`
@@ -29,7 +29,7 @@ type SendingProfile struct {
 	varsReplaced     bool
 }
 
-func (s *SendingProfile) ToJson() (string, error) {
+func (s *SendingProfile) ToJSON() (string, error) {
 	data, err := json.MarshalIndent(s, "", "  ")
 	if err != nil {
 		return "", err

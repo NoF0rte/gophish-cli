@@ -11,7 +11,7 @@ import (
 
 // Template models hold the attributes for an e-mail template to be sent to targets
 type Template struct {
-	Id             int64           `json:"id" yaml:"-"`
+	ID             int64           `json:"id" yaml:"-"`
 	Name           string          `json:"name" yaml:"name"`
 	EnvelopeSender string          `json:"envelope_sender" yaml:"-"`
 	Subject        string          `json:"subject" yaml:"subject"`
@@ -25,7 +25,7 @@ type Template struct {
 	Profile        *SendingProfile `json:"-" yaml:"profile,omitempty"`
 }
 
-func (t *Template) ToJson() (string, error) {
+func (t *Template) ToJSON() (string, error) {
 	data, err := json.MarshalIndent(t, "", "  ")
 	if err != nil {
 		return "", err

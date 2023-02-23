@@ -178,7 +178,7 @@ func (c *Client) GetTemplateByID(id int) (*models.Template, error) {
 		return nil, err
 	}
 
-	if t.Id == 0 {
+	if t.ID == 0 {
 		return nil, nil
 	}
 
@@ -234,7 +234,7 @@ func (c *Client) GetSendingProfileByID(id int) (*models.SendingProfile, error) {
 		return nil, err
 	}
 
-	if profile.Id == 0 {
+	if profile.ID == 0 {
 		return nil, nil
 	}
 
@@ -301,11 +301,11 @@ func (c *Client) DeleteTemplateByName(name string) (*models.GenericResponse, err
 		return nil, fmt.Errorf("template %s not found", name)
 	}
 
-	return c.DeleteTemplateByID(template.Id)
+	return c.DeleteTemplateByID(template.ID)
 }
 
 func (c *Client) CreateTemplate(template *models.Template) (*models.Template, error) {
-	template.Id = 0 // Ensure the ID is always 0
+	template.ID = 0 // Ensure the ID is always 0
 
 	_, result, err := c.post("/api/templates/", template, &models.Template{})
 	if err != nil {
@@ -316,7 +316,7 @@ func (c *Client) CreateTemplate(template *models.Template) (*models.Template, er
 }
 
 func (c *Client) CreateSendingProfile(profile *models.SendingProfile) (*models.SendingProfile, error) {
-	profile.Id = 0 // Ensure the ID is always 0
+	profile.ID = 0 // Ensure the ID is always 0
 
 	if profile.Interface == "" {
 		profile.Interface = models.InterfaceSMTP
@@ -331,7 +331,7 @@ func (c *Client) CreateSendingProfile(profile *models.SendingProfile) (*models.S
 }
 
 func (c *Client) UpdateSendingProfile(id int64, profile *models.SendingProfile) (*models.SendingProfile, error) {
-	profile.Id = id
+	profile.ID = id
 	_, result, err := c.put(fmt.Sprintf("/api/smtp/%d", id), profile, &models.SendingProfile{})
 	if err != nil {
 		return nil, err
@@ -368,5 +368,15 @@ func (c *Client) DeleteSendingProfileByName(name string) (*models.GenericRespons
 		return nil, fmt.Errorf("profile %s not found", name)
 	}
 
-	return c.DeleteSendingProfileByID(profile.Id)
+	return c.DeleteSendingProfileByID(profile.ID)
+}
+
+func (c *Client) GetCampaigns() ([]*models.Campaign, error) {
+	var campaigns []*models.Campaign
+	_, _, err := c.get("/api/campaigns/", &campaigns)
+	if err != nil {
+		return nil, err
+	}
+
+	return campaigns, nil
 }

@@ -47,7 +47,7 @@ var profilesCmd = &cobra.Command{
 		}
 
 		if len(profiles) == 1 {
-			data, err := profiles[0].ToJson()
+			data, err := profiles[0].ToJSON()
 			checkError(err)
 
 			fmt.Println(data)

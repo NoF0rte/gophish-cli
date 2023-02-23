@@ -46,7 +46,7 @@ var addTemplateCmd = &cobra.Command{
 				if found != nil {
 					fmt.Printf("[+] Updating sending profile \"%s\"\n", template.Profile.Name)
 
-					_, err := client.UpdateSendingProfile(found.Id, template.Profile)
+					_, err := client.UpdateSendingProfile(found.ID, template.Profile)
 					checkError(err)
 				} else {
 					fmt.Printf("[+] Adding sending profile \"%s\"\n", template.Profile.Name)

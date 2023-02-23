@@ -55,7 +55,7 @@ var templatesCmd = &cobra.Command{
 		}
 
 		if len(templates) == 1 {
-			data, err := templates[0].ToJson()
+			data, err := templates[0].ToJSON()
 			checkError(err)
 
 			fmt.Println(data)
