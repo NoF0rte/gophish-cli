@@ -6,7 +6,7 @@ import (
 	"os"
 	"reflect"
 
-	"github.com/NoF0rte/gophish-cli/pkg/api"
+	"github.com/NoF0rte/gophish-client/api"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

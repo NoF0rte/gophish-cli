@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/NoF0rte/gophish-cli/pkg/api/models"
+	"github.com/NoF0rte/gophish-client/api/models"
 	"github.com/spf13/cobra"
 )
 
