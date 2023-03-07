@@ -26,19 +26,22 @@ $ gophish-cli --help
 A CLI to interact with the Gophish API
 
 Usage:
-  gophish-cli [flags]
   gophish-cli [command]
 
 Available Commands:
+  campaigns   List, add, or delete campaigns
   completion  Generate the autocompletion script for the specified shell
   config      Display config information
   help        Help about any command
+  login       Login to GoPhish and attempt to retrieve the user's API key
+  profiles    List, add, or delete sending profiles
   templates   List, add, or delete e-mail templates
 
 Flags:
-  -T, --api-key string   A valid Gophish API key
-  -h, --help             help for gophish-cli
-  -u, --url string       The URL to the Gophish server (default "https://localhost:3333")
+  -T, --api-key string        A valid Gophish API key
+  -h, --help                  help for gophish-cli
+  -u, --url string            The URL to the Gophish server (default "https://localhost:3333")
+  -V, --vars stringToString   Variables to use when creating/editing items from files that have replacement variables. Use name=value syntax. (default [])
 
 Use "gophish-cli [command] --help" for more information about a command.
 
