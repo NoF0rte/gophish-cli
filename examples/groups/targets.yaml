@@ -1,0 +1,8 @@
+- email: john.doe@example.com
+  first-name: John
+  last-name: Doe
+  position: "Sales Associate at {{.COMPANY}}"
+- email: jane.doe@example.com
+  first-name: Jane
+  last-name: Doe
+  position: "Sales Executive at {{.COMPANY}}"

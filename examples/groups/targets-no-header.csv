@@ -1,0 +1,2 @@
+John,Doe,john.doe@example.com,Sales Associate at {{.COMPANY}}
+Jane,Doe,jane.doe@example.com,Sales Executive at {{.COMPANY}}
