@@ -34,7 +34,7 @@ var profilesCmd = &cobra.Command{
 				profiles = append(profiles, profile)
 			}
 		} else if re != "" {
-			profiles, err = client.GetSendingProfileByRegex(re)
+			profiles, err = client.GetSendingProfilesByRegex(re)
 			checkError(err)
 		} else {
 			profiles, err = client.GetSendingProfiles()

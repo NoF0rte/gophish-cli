@@ -3,7 +3,7 @@ module github.com/NoF0rte/gophish-cli
 go 1.19
 
 require (
-	github.com/NoF0rte/gophish-client v0.1.0
+	github.com/NoF0rte/gophish-client v0.1.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.15.0
@@ -16,6 +16,7 @@ require (
 	github.com/andybalholm/cascadia v1.3.1 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
+	github.com/gocarina/gocsv v0.0.0-20230406101422-6445c2b15027 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect

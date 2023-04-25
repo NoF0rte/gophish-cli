@@ -8,8 +8,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// addCmd represents the add command
-var addCmd = &cobra.Command{
+// profilesAddCmd represents the add command
+var profilesAddCmd = &cobra.Command{
 	Use:   "add",
 	Short: "Add new sending profiles",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -41,8 +41,8 @@ var addCmd = &cobra.Command{
 }
 
 func init() {
-	profilesCmd.AddCommand(addCmd)
+	profilesCmd.AddCommand(profilesAddCmd)
 
-	addCmd.Flags().StringP("dir", "d", "", "Directory containing the sending profiles to add. Both .yaml and .yml files will be used.")
-	addCmd.Flags().StringSliceP("profiles", "p", []string{}, "The paths of the profiles to add. Specify multiple times to add more profiles.")
+	profilesAddCmd.Flags().StringP("dir", "d", "", "Directory containing the sending profiles to add. Both .yaml and .yml files will be used.")
+	profilesAddCmd.Flags().StringSliceP("profiles", "p", []string{}, "The paths of the profiles to add. Specify multiple times to add more profiles.")
 }

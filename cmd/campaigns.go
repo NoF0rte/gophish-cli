@@ -21,28 +21,22 @@ var campaignsCmd = &cobra.Command{
 		var err error
 		var campaigns []*models.Campaign
 		if id > 0 {
-			fmt.Println("Not implemented")
-			return
-			// template, err := client.GetTemplateByID(id)
-			// checkError(err)
+			campaign, err := client.GetCampaignByID(id)
+			checkError(err)
 
-			// if template != nil {
-			// 	campaigns = append(campaigns, template)
-			// }
+			if campaign != nil {
+				campaigns = append(campaigns, campaign)
+			}
 		} else if name != "" {
-			// template, err := client.GetTemplateByName(name)
-			// checkError(err)
+			campaign, err := client.GetCampaignByName(name)
+			checkError(err)
 
-			// if template != nil {
-			// 	campaigns = append(campaigns, template)
-			// }
-			fmt.Println("Not implemented")
-			return
+			if campaign != nil {
+				campaigns = append(campaigns, campaign)
+			}
 		} else if re != "" {
-			// campaigns, err = client.GetTemplatesByRegex(re)
-			// checkError(err)
-			fmt.Println("Not implemented")
-			return
+			campaigns, err = client.GetCampaignsByRegex(re)
+			checkError(err)
 		} else {
 			campaigns, err = client.GetCampaigns()
 			checkError(err)
@@ -57,6 +51,7 @@ var campaignsCmd = &cobra.Command{
 			for _, c := range campaigns {
 				c.Template.HTML = ""
 				c.Template.Text = ""
+				c.Page.HTML = ""
 			}
 		}
 
@@ -81,5 +76,5 @@ func init() {
 	campaignsCmd.Flags().StringP("name", "n", "", "Get the campaign by name.")
 	campaignsCmd.Flags().Int("id", 0, "Get the campaign by ID")
 	campaignsCmd.Flags().StringP("regex", "r", "", "List the campaigns with the name matching the regex.")
-	campaignsCmd.Flags().Bool("show-content", false, "Show the campaign's template content in output")
+	campaignsCmd.Flags().Bool("show-content", false, "Show the campaign's template and page content in output")
 }
