@@ -5,6 +5,7 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.org/x/term"
 )
 
@@ -15,6 +16,7 @@ var loginCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		username, _ := cmd.Flags().GetString("username")
 		password, _ := cmd.Flags().GetString("password")
+		save, _ := cmd.Flags().GetBool("save")
 
 		if password == "-" {
 			fmt.Printf("[-] Enter password: ")
@@ -33,6 +35,10 @@ var loginCmd = &cobra.Command{
 		}
 
 		fmt.Println(apiKey)
+		if save {
+			viper.Set("api-key", apiKey)
+			saveConfig(false)
+		}
 	},
 }
 
@@ -42,4 +48,5 @@ func init() {
 	loginCmd.Flags().StringP("username", "U", "admin", "The user's username")
 	loginCmd.Flags().StringP("password", "p", "", "The user's password. Use '-' to be prompted for the password.")
 	loginCmd.MarkFlagRequired("password")
+	loginCmd.Flags().BoolP("save", "s", false, "Save the API key to the config")
 }
