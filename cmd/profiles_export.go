@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/NoF0rte/gophish-client/api/models"
 	"github.com/spf13/cobra"
@@ -54,10 +52,8 @@ var profilesExportCmd = &cobra.Command{
 
 		fmt.Printf("[+] Exporting %d sending profiles...\n", len(profiles))
 
-		replaceRe := regexp.MustCompile(`[ /]`)
 		for _, t := range profiles {
-			name := strings.ToLower(replaceRe.ReplaceAllString(t.Name, "-"))
-			name = filepath.Clean(name)
+			name := sanitize(t.Name)
 
 			data, err := yaml.Marshal(t)
 			checkError(err)

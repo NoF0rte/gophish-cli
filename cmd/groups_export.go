@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/NoF0rte/gophish-client/api/models"
 	"github.com/gocarina/gocsv"
@@ -57,10 +55,8 @@ var groupsExportCmd = &cobra.Command{
 
 		fmt.Printf("[+] Exporting %d groups...\n", len(groups))
 
-		replaceRe := regexp.MustCompile(`[ /]`)
 		for _, g := range groups {
-			name := strings.ToLower(replaceRe.ReplaceAllString(g.Name, "-"))
-			name = filepath.Clean(name)
+			name := sanitize(g.Name)
 
 			if asYAML || asCSV {
 				var data []byte

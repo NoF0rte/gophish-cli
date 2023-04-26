@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/NoF0rte/gophish-client/api/models"
 	"github.com/spf13/cobra"
@@ -55,20 +53,11 @@ var pagesExportCmd = &cobra.Command{
 
 		fmt.Printf("[+] Exporting %d pages...\n", len(pages))
 
-		replaceRe := regexp.MustCompile(`[ /]`)
 		for _, p := range pages {
-			name := strings.ToLower(replaceRe.ReplaceAllString(p.Name, "-"))
-			name = filepath.Clean(name)
+			name := sanitize(p.Name)
 
 			if contentFiles {
-				if p.HTML != "" {
-					p.HTMLFile = fmt.Sprintf("%s.html", name)
-
-					err := os.WriteFile(filepath.Join(dir, p.HTMLFile), []byte(p.HTML), 0644)
-					checkError(err)
-
-					p.HTML = ""
-				}
+				writePageContentFile(p, name, dir)
 			}
 
 			data, err := yaml.Marshal(p)
@@ -78,6 +67,17 @@ var pagesExportCmd = &cobra.Command{
 			checkError(err)
 		}
 	},
+}
+
+func writePageContentFile(p *models.Page, name string, dir string) {
+	if p.HTML != "" {
+		p.HTMLFile = fmt.Sprintf("%s.html", name)
+
+		err := os.WriteFile(filepath.Join(dir, p.HTMLFile), []byte(p.HTML), 0644)
+		checkError(err)
+
+		p.HTML = ""
+	}
 }
 
 func init() {

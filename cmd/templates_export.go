@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 
 	"github.com/NoF0rte/gophish-client/api/models"
 	"github.com/spf13/cobra"
@@ -55,29 +53,11 @@ var templatesExportCmd = &cobra.Command{
 
 		fmt.Printf("[+] Exporting %d templates...\n", len(templates))
 
-		replaceRe := regexp.MustCompile(`[ /]`)
 		for _, t := range templates {
-			name := strings.ToLower(replaceRe.ReplaceAllString(t.Name, "-"))
-			name = filepath.Clean(name)
+			name := sanitize(t.Name)
 
 			if contentFiles {
-				if t.Text != "" {
-					t.TextFile = fmt.Sprintf("%s.txt", name)
-
-					err := os.WriteFile(filepath.Join(dir, t.TextFile), []byte(t.Text), 0644)
-					checkError(err)
-
-					t.Text = ""
-				}
-
-				if t.HTML != "" {
-					t.HTMLFile = fmt.Sprintf("%s.html", name)
-
-					err := os.WriteFile(filepath.Join(dir, t.HTMLFile), []byte(t.HTML), 0644)
-					checkError(err)
-
-					t.HTML = ""
-				}
+				writeTemplateContentFiles(t, name, dir)
 			}
 
 			data, err := yaml.Marshal(t)
@@ -87,6 +67,26 @@ var templatesExportCmd = &cobra.Command{
 			checkError(err)
 		}
 	},
+}
+
+func writeTemplateContentFiles(t *models.Template, name string, dir string) {
+	if t.Text != "" {
+		t.TextFile = fmt.Sprintf("%s.txt", name)
+
+		err := os.WriteFile(filepath.Join(dir, t.TextFile), []byte(t.Text), 0644)
+		checkError(err)
+
+		t.Text = ""
+	}
+
+	if t.HTML != "" {
+		t.HTMLFile = fmt.Sprintf("%s.html", name)
+
+		err := os.WriteFile(filepath.Join(dir, t.HTMLFile), []byte(t.HTML), 0644)
+		checkError(err)
+
+		t.HTML = ""
+	}
 }
 
 func init() {

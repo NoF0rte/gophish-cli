@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"reflect"
+	"regexp"
+	"strings"
 
 	"github.com/NoF0rte/gophish-client/api"
 	"github.com/mitchellh/go-homedir"
@@ -41,6 +44,12 @@ var rootCmd = &cobra.Command{
 
 		client = api.NewClient(viper.GetString("url"), viper.GetString("api-key"))
 	},
+}
+
+func sanitize(name string) string {
+	replaceRe := regexp.MustCompile(`[ /]`)
+	name = strings.ToLower(replaceRe.ReplaceAllString(name, "-"))
+	return filepath.Clean(name)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
