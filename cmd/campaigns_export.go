@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/NoF0rte/gophish-cli/internal/export"
 	"github.com/NoF0rte/gophish-client/api/models"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -51,33 +52,22 @@ var campaignsExportCmd = &cobra.Command{
 		dir, _ := cmd.Flags().GetString("dir")
 		contentFiles, _ := cmd.Flags().GetBool("content-files")
 		full, _ := cmd.Flags().GetBool("full")
+		includeResults, _ := cmd.Flags().GetBool("results")
 
 		fmt.Printf("[+] Exporting %d campaigns...\n", len(campaigns))
 
-		for _, c := range campaigns {
-			campaignName := sanitize(c.Name)
+		for _, campaign := range campaigns {
+			campaignName := sanitize(campaign.Name)
 
+			var c interface{} = campaign
 			if !full {
-				c.Page = &models.Page{
-					Name: c.Page.Name,
-				}
-
-				c.Results = nil
-				c.Timeline = nil
-
-				c.SMTP = &models.SendingProfile{
-					Name: c.SMTP.Name,
-				}
-
-				c.Template = &models.Template{
-					Name: c.Template.Name,
-				}
+				c = export.NewCampaign(campaign, includeResults)
 			} else if contentFiles {
-				templateName := sanitize(c.Template.Name)
-				writeTemplateContentFiles(c.Template, fmt.Sprintf("%s - %s", campaignName, templateName), dir)
+				templateName := sanitize(campaign.Template.Name)
+				writeTemplateContentFiles(campaign.Template, fmt.Sprintf("%s - %s", campaignName, templateName), dir)
 
-				pageName := sanitize(c.Page.Name)
-				writePageContentFile(c.Page, fmt.Sprintf("%s - %s", campaignName, pageName), dir)
+				pageName := sanitize(campaign.Page.Name)
+				writePageContentFile(campaign.Page, fmt.Sprintf("%s - %s", campaignName, pageName), dir)
 			}
 
 			data, err := yaml.Marshal(c)
@@ -96,6 +86,7 @@ func init() {
 	campaignsExportCmd.Flags().Int("id", 0, "Export the campaign by ID")
 	campaignsExportCmd.Flags().StringP("regex", "r", "", "Export the campaigns with the name matching the regex.")
 	campaignsExportCmd.Flags().Bool("full", false, "Run a full export. This includes all data for each campaign's template, landing page, sending profile, and results.")
+	campaignsExportCmd.Flags().Bool("results", false, "Include the campaign's results.")
 	campaignsExportCmd.Flags().Bool("content-files", false, "Create separate template and landing page content files for each campaign. Only applies when doing a full export.")
 	campaignsExportCmd.Flags().StringP("dir", "d", "", "Directory to export the campaigns. Defaults to the current directory.")
 }
