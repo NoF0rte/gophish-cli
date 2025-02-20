@@ -3,7 +3,7 @@ module github.com/NoF0rte/gophish-cli
 go 1.19
 
 require (
-	github.com/NoF0rte/gophish-client v0.1.6
+	github.com/NoF0rte/gophish-client v0.1.7
 	github.com/gocarina/gocsv v0.0.0-20230406101422-6445c2b15027
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.6.1
